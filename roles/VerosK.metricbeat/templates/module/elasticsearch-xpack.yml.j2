@@ -1,0 +1,12 @@
+
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-elasticsearch.html
+
+- module: elasticsearch
+  xpack.enabled: true
+  period: 15s
+  hosts: [ {{ metricbeat_es_collector_url|to_json }} ]
+  username: {{ metricbeat_es_collector_user|to_json }}
+  password: {{ metricbeat_es_collector_password|to_json }}
+  ssl.certificate_authorities: {{ metricbeat_es_collector_cert_path|to_json }}
+
+

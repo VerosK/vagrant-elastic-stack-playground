@@ -1,0 +1,6 @@
+---
+- name: Install auditbeat (Debian)
+  apt:
+    name: '{{ auditbeat_packages }}'
+    state: present
+    cache_valid_time: 3600

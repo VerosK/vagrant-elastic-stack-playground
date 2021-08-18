@@ -1,0 +1,5 @@
+---
+- name: Install filebeat packages
+  yum:
+    name: '{{ filebeat_packages }}'
+    state: present

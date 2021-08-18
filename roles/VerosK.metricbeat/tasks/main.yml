@@ -1,0 +1,69 @@
+---
+# yamllint disable rule:line-length
+
+
+- name: "Include distribution specific variables defaults"
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      path:
+        - '../vars'
+
+- name: Copy default variables when required
+  set_fact:
+    metricbeat_packages: '{{ metricbeat_packages|default(__metricbeat_packages) }}'
+    metricbeat_binary: '{{ metricbeat_binary|default(__metricbeat_binary) }}'
+    metricbeat_config_path: '{{ metricbeat_config_path|default(__metricbeat_config_path) }}'
+    metricbeat_service_name: '{{ metricbeat_service_name|default(__metricbeat_service_name) }}'
+
+# yamllint enable rule:line-length
+- include: setup-RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: setup-Debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Provide metricbeat test config
+  template:
+    src: 'metricbeat.yml.j2'
+    dest: '{{ metricbeat_config_path }}~'
+    owner: root
+
+- name: Provide metricbeat config
+  template:
+    src: 'metricbeat.yml.j2'
+    dest: '{{ metricbeat_config_path }}'
+    owner: root
+    mode: 0600
+    validate: '{{ metricbeat_binary }} test config -c %s'
+    backup: '{{ metricbeat_backup_config }}'
+  notify: reload metricbeat
+
+
+- name: Ensure metricbeat module config
+  template:
+    src: module/elasticsearch-xpack.yml.j2
+    dest: //etc/metricbeat/modules.d/elasticsearch-xpack.yml
+    backup: '{{ metricbeat_backup_config }}'
+    owner: root
+    mode: 0600
+  when: metricbeat_with_es_xpack_config|default(False)
+  notify: reload metricbeat
+
+- name: Make sure metricbeat is up
+  service:
+    name: '{{ metricbeat_service_name }}'
+    state: started
+    enabled: true
+
+- name: Enable metricbeat modules
+  include_tasks: enable-metricbeat-module.yml
+  loop: '{{ metricbeat_modules }}'
+  loop_control:
+    loop_var: module
+
+- meta: flush_handlers

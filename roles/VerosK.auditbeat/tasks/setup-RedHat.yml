@@ -1,0 +1,5 @@
+---
+- name: Install auditbeat packages
+  yum:
+    name: '{{ auditbeat_packages }}'
+    state: present

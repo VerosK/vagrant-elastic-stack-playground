@@ -1,0 +1,51 @@
+---
+# yamllint disable rule:line-length
+
+
+- name: "Include distribution specific variables defaults"
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      path:
+        - '../vars'
+
+- name: Copy default variables when required
+  set_fact:
+    packetbeat_packages: '{{ packetbeat_packages|default(__packetbeat_packages) }}'
+    packetbeat_binary: '{{ packetbeat_binary|default(__packetbeat_binary) }}'
+    packetbeat_config_path: '{{ packetbeat_config_path|default(__packetbeat_config_path) }}'
+    packetbeat_service_name: '{{ packetbeat_service_name|default(__packetbeat_service_name) }}'
+
+# yamllint enable rule:line-length
+- include: setup-RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: setup-Debian.yml
+  when: ansible_os_family == "Debian"
+
+
+- name: Provide packetbeat test config
+  template:
+    src: 'packetbeat.yml.j2'
+    dest: '{{ packetbeat_config_path }}~'
+    owner: root
+
+- name: Provide packetbeat config
+  template:
+    src: 'packetbeat.yml.j2'
+    dest: '{{ packetbeat_config_path }}'
+    owner: root
+    mode: 0600
+    validate: '{{ packetbeat_binary }} test config -c %s'
+    backup: '{{ packetbeat_backup_config }}'
+  notify: reload packetbeat
+
+- name: Make sure packetbeat is up
+  service:
+    name: '{{ packetbeat_service_name }}'
+    state: started
+    enabled: true

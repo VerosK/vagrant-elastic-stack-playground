@@ -1,0 +1,6 @@
+---
+- name: Install metricbeat (Debian)
+  apt:
+    name: '{{ metricbeat_packages }}'
+    state: present
+    cache_valid_time: 3600

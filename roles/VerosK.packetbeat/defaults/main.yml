@@ -1,0 +1,17 @@
+---
+packetbeat_processors:
+  - add_host_metadata
+  - add_cloud_metadata
+
+packetbeat_name: '{{ ansible_fqdn }}'
+packetbeat_tags: []  # no tags to add
+
+
+# Do packetbeat config backup?
+packetbeat_backup_config: true
+
+packetbeat_elasticsearch_output_enabled: true
+packetbeat_elasticsearch_output_hosts: [ "127.0.0.1:9200" ]
+
+# not any,
+packetbeat_interface: '{{ ansible_default_ipv4.interface }}'

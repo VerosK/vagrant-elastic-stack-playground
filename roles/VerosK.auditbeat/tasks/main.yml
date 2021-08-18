@@ -1,0 +1,54 @@
+---
+# yamllint disable rule:line-length
+
+
+- name: "Include distribution specific variables defaults"
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      path:
+        - '../vars'
+
+- name: Copy default variables when required
+  set_fact:
+    auditbeat_packages: '{{ auditbeat_packages|default(__auditbeat_packages) }}'
+    auditbeat_binary: '{{ auditbeat_binary|default(__auditbeat_binary) }}'
+    auditbeat_config_path: '{{ auditbeat_config_path|default(__auditbeat_config_path) }}'
+    auditbeat_service_name: '{{ auditbeat_service_name|default(__auditbeat_service_name) }}'
+
+# yamllint enable rule:line-length
+- include: setup-RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: setup-Debian.yml
+  when: ansible_os_family == "Debian"
+
+
+- name: Provide auditbeat test config
+  template:
+    src: 'auditbeat.yml.j2'
+    dest: '{{ auditbeat_config_path }}~'
+    owner: root
+
+- name: Provide auditbeat config
+  template:
+    src: 'auditbeat.yml.j2'
+    dest: '{{ auditbeat_config_path }}'
+    owner: root
+    mode: 0600
+    # this does not work for auditbeat 7.14 :shrug:
+    #validate: '{{ auditbeat_binary }} test config -c %s'
+    backup: '{{ auditbeat_backup_config }}'
+  vars:
+    ansible_command_timeout: 10
+  notify: reload auditbeat
+
+- name: Make sure auditbeat is up
+  service:
+    name: '{{ auditbeat_service_name }}'
+    state: started
+    enabled: true

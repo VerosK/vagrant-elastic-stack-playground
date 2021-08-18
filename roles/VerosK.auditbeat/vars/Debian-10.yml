@@ -1,0 +1,9 @@
+---
+
+__auditbeat_packages:
+  - auditbeat
+
+__auditbeat_binary:  /usr/bin/auditbeat
+__auditbeat_config_path: /etc/auditbeat/auditbeat.yml
+
+__auditbeat_service_name: auditbeat

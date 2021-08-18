@@ -1,0 +1,20 @@
+---
+auditbeat_processors:
+  - add_host_metadata
+  - add_cloud_metadata
+  - add_docker_metadata
+
+auditbeat_name: '{{ ansible_fqdn }}'
+auditbeat_tags: []  # no tags to add
+
+auditbeat_redis_output_enabled: false
+auditbeat_redis_output_hosts: [ "127.0.0.1:6379" ]
+auditbeat_redis_output_key: auditbeat
+auditbeat_redis_output_db: 0
+auditbeat_redis_output_timeout: 5
+
+# Do auditbeat config backup?
+auditbeat_backup_config: true
+
+auditbeat_elasticsearch_output_enabled: true
+auditbeat_elasticsearch_output_hosts: [ "127.0.0.1:9200" ]

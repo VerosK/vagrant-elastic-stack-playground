@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Veros Kaplan
+  description: Just another Kibana
+
+  license: BSD
+
+  min_ansible_version: 2.2
+
+  # If this a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  platforms:
+     - name: EL
+       version: [ 7 ]
+     - name: Ubuntu
+       version: [ xenial ]
+
+  galaxy_tags: []
+
+  dependencies: []

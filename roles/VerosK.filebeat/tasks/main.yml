@@ -1,0 +1,58 @@
+---
+# yamllint disable rule:line-length
+
+
+- name: "Include distribution specific variables defaults"
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      path:
+        - '../vars'
+
+- name: Copy default variables when required
+  set_fact:
+    filebeat_packages: '{{ filebeat_packages|default(__filebeat_packages) }}'
+    filebeat_binary: '{{ filebeat_binary|default(__filebeat_binary) }}'
+    filebeat_config_path: '{{ filebeat_config_path|default(__filebeat_config_path) }}'
+    filebeat_service_name: '{{ filebeat_service_name|default(__filebeat_service_name) }}'
+
+# yamllint enable rule:line-length
+- include: setup-RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: setup-Debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Provide filebeat test config
+  template:
+    src: 'filebeat.yml.j2'
+    dest: '{{ filebeat_config_path }}~'
+    owner: root
+
+- name: Provide filebeat config
+  template:
+    src: 'filebeat.yml.j2'
+    dest: '{{ filebeat_config_path }}'
+    owner: root
+    mode: 0600
+    validate: '{{ filebeat_binary }} test config -c %s'
+    backup: '{{ filebeat_backup_config }}'
+  notify: reload filebeat
+
+- name: Make sure filebeat is up
+  service:
+    name: '{{ filebeat_service_name }}'
+    state: started
+    enabled: true
+
+- name: Enable filebeat modules
+  include_tasks: enable-filebeat-module.yml
+  loop: '{{ filebeat_modules }}'
+  loop_control:
+    loop_var: module
+
+

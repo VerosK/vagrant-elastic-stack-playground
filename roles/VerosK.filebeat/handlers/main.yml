@@ -1,0 +1,5 @@
+---
+- name: reload filebeat
+  service:
+    name: '{{ filebeat_service_name }}'
+    state: restarted

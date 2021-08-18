@@ -1,0 +1,10 @@
+---
+
+__filebeat_packages:
+  - filebeat
+
+__filebeat_binary:  /usr/bin/filebeat
+__filebeat_config_path: /etc/filebeat/filebeat.yml
+
+__filebeat_service_name: filebeat
+

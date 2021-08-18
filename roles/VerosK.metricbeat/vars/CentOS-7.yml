@@ -1,0 +1,10 @@
+---
+
+__metricbeat_packages:
+  - metricbeat
+
+__metricbeat_binary:  /usr/bin/metricbeat
+__metricbeat_config_path: /etc/metricbeat/metricbeat.yml
+
+__metricbeat_service_name: metricbeat
+

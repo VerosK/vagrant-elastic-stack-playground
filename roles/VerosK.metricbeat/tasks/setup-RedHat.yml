@@ -1,0 +1,13 @@
+---
+- name: Create ES yumrepo
+  template:
+      src: elasticsearch-yum.repo.j2
+      dest: /etc/yum.repos.d/{{ elasticsearch_yumrepo_name }}.repo
+      owner: root
+      backup: '{{ elasticsearch_do_backups }}'
+  when: elasticearch_manage_yumrepo
+
+- name: Install metricbeat packages
+  yum:
+    name: '{{ metricbeat_packages }}'
+    state: present

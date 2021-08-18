@@ -1,0 +1,46 @@
+---
+filebeat_processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+
+
+filebeat_inputs:
+  - name: syslog
+    config:
+      type: syslog
+      enabled: true
+      protocol.tcp:
+        host: "127.0.0.1:5514"
+      fields:
+        logsource: filebeat
+      fields_under_root: true
+
+filebeat_modules:
+  - name: system
+    enabled: true
+  - name: iptables
+    enabled: true
+  - name: elasticsearch
+    enabled: true
+  - name: auditd
+    enabled: true
+
+
+filebeat_name: '{{ ansible_fqdn }}'
+filebeat_tags: []  # no tags to add
+
+filebeat_redis_output_enabled: false
+filebeat_redis_output_hosts: [ "127.0.0.1:6379" ]
+filebeat_redis_output_key: filebeat
+filebeat_redis_output_db: 0
+filebeat_redis_output_timeout: 5
+
+# Do filebeat config backup?
+filebeat_backup_config: true
+
+filebeat_elasticsearch_output_enabled: true
+filebeat_elasticsearch_output_hosts: [ "127.0.0.1:9200" ]

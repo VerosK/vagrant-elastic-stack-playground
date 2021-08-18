@@ -1,0 +1,6 @@
+# TODO: Add debian repository
+
+- name: Install kibana (DEB)
+  apt:
+    name: kibana
+    state: present

@@ -1,0 +1,5 @@
+---
+- name: reload packetbeat
+  service:
+    name: '{{ packetbeat_service_name }}'
+    state: restarted

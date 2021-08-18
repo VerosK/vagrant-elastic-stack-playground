@@ -1,0 +1,25 @@
+
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Provide kibana config
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    backup: yes
+  notify: restart kibana
+
+- name: Setup kibana service
+  service:
+    name: '{{ kibana_service_name }}'
+    state: '{{ kibana_service_state }}'
+    enabled: '{{ kibana_service_enabled }}'
+
+- meta: flush_handlers
+
+- wait_for:
+    port: '{{ kibana_http_port }}'
+    timeout: 30

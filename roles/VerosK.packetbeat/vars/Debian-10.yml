@@ -1,0 +1,9 @@
+---
+
+__packetbeat_packages:
+  - packetbeat
+
+__packetbeat_binary:  /usr/bin/packetbeat
+__packetbeat_config_path: /etc/packetbeat/packetbeat.yml
+
+__packetbeat_service_name: packetbeat

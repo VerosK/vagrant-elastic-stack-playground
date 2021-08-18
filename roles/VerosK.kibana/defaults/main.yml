@@ -1,0 +1,30 @@
+# service config
+kibana_service_name: kibana
+kibana_service_state: started
+kibana_service_enabled: true
+kibana_do_backups: true
+
+kibana_address: "127.0.0.1"
+kibana_http_port: "5601"
+kibana_extra_config: ~
+
+kibana_servername: "{{ ansible_hostname }}"
+
+kibana_elasticsearch_hosts: [ "http://localhost:9200" ]
+
+# kibana URL base path
+kibana_basepath: ""
+
+# in miliseconds
+kibana_elasticsearch_ping_timeout: 3000
+kibana_elasticsearch_request_timeout: 30000
+
+# which elasticsearch
+elasticsearch_series: 7.x
+elasticearch_manage_yumrepo: True
+elasticsearch_yumrepo_name: elasticsearch-{{ elasticsearch_series }}
+elasticsearch_yumrepo_url: https://artifacts.elastic.co/packages/{{ elasticsearch_series }}/yum
+elasticsearch_yumrepo_enabled: 1
+
+# should we do config backups?
+elasticsearch_do_backups: true

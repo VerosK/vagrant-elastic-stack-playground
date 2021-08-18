@@ -1,0 +1,5 @@
+---
+- name: reload auditbeat
+  service:
+    name: '{{ auditbeat_service_name }}'
+    state: restarted

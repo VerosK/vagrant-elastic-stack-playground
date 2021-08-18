@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  role_name: packetbeat
+  author: Veros Kaplan <verosk@noreply.users.github.com>
+  description: Ansible Role for haproxy setup
+  company: N/A
+  license: MIT
+  min_ansible_version: 2.6
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - buster
+    - name: EL
+      versions:
+        - 7
+        - 8
+  galaxy_tags:
+    - system
+
+dependencies: []

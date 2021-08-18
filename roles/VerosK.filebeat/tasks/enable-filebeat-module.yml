@@ -1,0 +1,23 @@
+- name: Check module {{ module.name }} is present
+  find:
+    paths: /etc/filebeat/modules.d/
+    patterns:
+        - '{{ module.name }}.yml'
+        - '{{ module.name }}.yml.disabled'
+  register: _configs
+
+- name: Ensure module config exists - `{{ module.name }}.yml`
+  assert:
+    that: '_configs.matched == 1'
+
+- name: Enable when required
+  command: filebeat modules enable {{ module.name }}
+  when:
+    - module.enabled
+    - _configs.files[0].path.endswith('disabled')
+
+- name: Disabled when required
+  command: filebeat modules enable {{ module.name }}
+  when:
+    - not module.enabled
+    - not _configs.files[0].path.endswith('disabled')

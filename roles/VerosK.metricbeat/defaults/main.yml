@@ -1,0 +1,32 @@
+---
+metricbeat_name: '{{ ansible_fqdn }}'
+metricbeat_tags: []  # no tags to add
+
+# Do metricbeat config backup?
+metricbeat_backup_config: true
+
+metricbeat_elasticsearch_output_enabled: true
+metricbeat_elasticsearch_output_hosts: [ "127.0.0.1:9200" ]
+
+metricbeat_processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+metricbeat_modules:
+  - name: system
+    enabled: true
+
+metricbeat_monitor_elasticsearch: true
+
+# which elasticsearch
+elasticsearch_series: 7.x
+elasticearch_manage_yumrepo: True
+elasticsearch_yumrepo_name: elasticsearch-{{ elasticsearch_series }}
+elasticsearch_yumrepo_url: https://artifacts.elastic.co/packages/{{ elasticsearch_series }}/yum
+elasticsearch_yumrepo_enabled: 1
+
+# should we do config backups?
+elasticsearch_do_backups: true

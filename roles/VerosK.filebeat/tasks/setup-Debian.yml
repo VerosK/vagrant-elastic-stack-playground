@@ -1,0 +1,6 @@
+---
+- name: Install filebeat (Debian)
+  apt:
+    name: '{{ filebeat_packages }}'
+    state: present
+    cache_valid_time: 3600
