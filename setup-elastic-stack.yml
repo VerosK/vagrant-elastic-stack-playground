@@ -1,0 +1,36 @@
+#- import_playbook: preflight-tasks.yml
+
+- name: Setup elasticsearch
+  hosts: elasticsearch_nodes
+  environment:
+       no_proxy: 127.0.0.1
+  become: yes
+
+  roles:
+    - name: elastic.elasticsearch
+      tags: elasticsearch
+
+- name: Setup kibana
+  hosts: kibana_nodes
+  tags: kibana
+  become: yes
+
+  roles:
+    - name: VerosK.kibana
+      tags: kibana
+
+- name: Setup metricbeat
+  hosts: client_nodes
+  environment:
+       no_proxy: 127.0.0.1
+  become: yes
+
+  roles:
+    - name: VerosK.metricbeat
+      tags: metricbeat
+    - name: VerosK.filebeat
+      tags: filebeat
+    - name: VerosK.packetbeat
+      tags: packetbeat
+    - name: VerosK.auditbeat
+      tags: auditbeat

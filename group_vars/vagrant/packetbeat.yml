@@ -1,0 +1,13 @@
+packetbeat_backup_config: true
+
+packetbeat_elasticsearch_output_hosts:  '{{ elasticsearch_http_targets }}'
+
+packetbeat_es_cert_path: '{{ es_ca_cert_path }}'
+
+packetbeat_es_https: true
+packetbeat_es_user: 'packetbeat_push'
+packetbeat_es_password: '{{ secret_packetbeat_push }}'
+
+packetbeat_processors:
+  - add_host_metadata
+  - add_cloud_metadata

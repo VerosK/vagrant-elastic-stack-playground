@@ -1,0 +1,17 @@
+kibana_address: 0.0.0.0
+
+kibana_elasticsearch_hosts: '{{ elasticsearch_http_targets }}'
+
+
+kibana_es_username: kibana_server
+kibana_es_password: '{{ secret_kibana_password }}'
+kibana_es_ca_cert_path: '{{ es_ca_cert_path }}'
+
+kibana_config:
+  server.name: "{{ inventory_hostname }}"
+
+  # The URL of the Elasticsearch instance to use for all your queries.
+  elasticsearch.hosts: '{{ kibana_elasticsearch_hosts }}'
+  elasticsearch.username: kibana4_server
+  elasticsearch.password: '{{ secret_kibana_password }}'
+  elasticsearch.ssl.certificateAuthorities: [ "/etc/pki/ca.pem" ]

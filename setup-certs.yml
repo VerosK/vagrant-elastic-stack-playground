@@ -1,0 +1,105 @@
+#- import_playbook: preflight-tasks.yml
+
+- name: Create CA certs
+  hosts: localhost
+  tags: ca
+  become: no
+  tasks:
+    - name: Create cert dir
+      file:
+        path: files/es_certs
+        state: directory
+
+    - name: Create CA private key
+      openssl_privatekey:
+        path: files/es_certs/ca_key.pem
+
+    - name: Create CA CSR
+      openssl_csr:
+        path: files/es_certs/ca_cert.csr
+        privatekey_path: files/es_certs/ca_key.pem
+        country_name: '{{ es_cert_country }}'
+        organization_name: '{{ es_cert_organization_name }}'
+        basic_constraints:
+          - CA:TRUE
+
+    - name: Create CA cert
+      openssl_certificate:
+        path: files/es_certs/ca_cert.pem
+        privatekey_path: files/es_certs/ca_key.pem
+        csr_path: files/es_certs/ca_cert.csr
+        provider: selfsigned
+
+- name: Upload CA cert
+  tags: ca_cert
+  hosts: all
+  tasks:
+  - name: Create CA path
+    file:
+      path: '{{ es_certs_path }}'
+      state: directory
+      mode: 0755
+    become: yes
+
+  - name: Upload ES CA cert
+    copy:
+      src: files/es_certs/ca_cert.pem
+      dest: '{{ es_ca_cert_path }}'
+      mode: 0444
+    become: yes
+
+- name: Create ES certs
+  tags: certs
+  hosts: elasticsearch_nodes
+  become: false
+  tasks:
+    - name: Create cert dir
+      file:
+        path: files/es_certs/{{ inventory_hostname }}
+        state: directory
+      delegate_to: localhost
+
+    - name: Create ES private key
+      openssl_privatekey:
+        path: files/es_certs/{{ inventory_hostname }}/key.pem
+      delegate_to: localhost
+
+    - set_fact:
+        extra_cert_address: '127.0.0.2'
+
+    - name: 'Add extra_cert+address from Vagrant'
+      set_fact:
+        extra_cert_address: '{{ vagrant_private_ip }}'
+      when: vagrant_private_ip is defined
+
+    - name: Create ES CSR
+      openssl_csr:
+        path: files/es_certs/{{ inventory_hostname }}/cert.csr
+        privatekey_path: files/es_certs/{{ inventory_hostname }}/key.pem
+        country_name: '{{ es_cert_country }}'
+        organization_name: '{{ es_cert_organization_name }}'
+        common_name: '{{ ansible_host }}'
+        subject_alt_name:
+          - DNS:{{ ansible_fqdn }}
+          - DNS:{{ inventory_hostname }}
+          - DNS:localhost
+          - IP:127.0.0.1
+          - IP:{{ ansible_default_ipv4.address }}
+          - IP:{{ extra_cert_address }}
+        key_usage:
+          - digitalSignature
+        extended_key_usage:
+          - clientAuth
+          - serverAuth
+      delegate_to: localhost
+
+    - name: Create ES cert
+      openssl_certificate:
+        path: files/es_certs/{{ inventory_hostname }}/cert.pem
+        csr_path: files/es_certs/{{ inventory_hostname }}/cert.csr
+        ownca_not_after: "{{ es_cert_validity }}"
+        ownca_path: files/es_certs/ca_cert.pem
+        ownca_privatekey_path: files/es_certs/ca_key.pem
+        provider: ownca
+      delegate_to: localhost
+

@@ -1,0 +1,46 @@
+
+es_heap_size: '2G'
+
+es_initial_master_nodes: '{{ elasticsearch_node_addresses }}'
+es_discovery_seed_hosts: '{{ elasticsearch_node_addresses }}'
+
+es_role_master: 1
+es_role_voting_only: 0
+es_role_data: 1
+es_role_ingest: 1
+
+_es_node_roles: |
+  [
+    {% if es_role_master|default(0)|int %}"master", {% endif %}
+    {% if es_role_voting_only|default(0)|int %}"voting_only", {% endif %}
+    {% if es_role_data|default(0)|int %}"data", {% endif %}
+    {% if es_role_ingest|default(1)|int %}"ingest", {% endif %}
+    {% if es_role_data_hot|default(0)|int %}"data_hot", "data_content", "data_warm", {% endif %}
+    {% if es_role_data_cold|default(0)|int %}"data_cold", "data_frozen", {% endif %}
+  ]
+
+es_node_roles: '{{ _es_node_roles }}'
+
+# this is used for collecting data from elasticsearch
+metricbeat_es_collector_user: metricbeat_collector
+metricbeat_es_collector_password: '{{ secret_metricbeat_collector }}'
+metricbeat_es_collector_cert_path: '{{ metricbeat_es_cert_path }}'
+metricbeat_es_collector_url: 'https://{{ ansible_default_ipv4.address }}:9200'
+
+es_publish_address: '{{ vagrant_private_ip }}'
+
+es_config:
+  bootstrap.memory_lock: true
+  node.name: "{{ inventory_hostname }}"
+  cluster.name: "production"
+  cluster.initial_master_nodes: '{{ es_initial_master_nodes }}'
+  discovery.seed_hosts: '{{ es_discovery_seed_hosts }}'
+  network.host:
+    - 0.0.0.0
+  network.publish_host: '{{ es_publish_address }}'
+  http.port: '{{ es_api_port }}'
+  transport.port: '{{ es_transport_port }}'
+  node.roles: '{{ es_node_roles }}'
+
+  xpack.security.authc.realms.file.file1.order: 0
+  xpack.security.authc.realms.native.native1.order: 1

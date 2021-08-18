@@ -1,0 +1,8 @@
+
+es_certs_path: /etc/pki/elasticsearch/
+es_ca_cert_path: '{{ es_certs_path }}/ca.pem'
+
+
+es_cert_country: CZ
+es_cert_organization_name: "not implemented"
+es_cert_validity: "+3650d"

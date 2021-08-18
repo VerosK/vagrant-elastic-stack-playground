@@ -1,0 +1,16 @@
+filebeat_backup_config: true
+
+filebeat_elasticsearch_output_hosts: '{{ elasticsearch_http_targets }}'
+
+filebeat_es_cert_path: '{{ es_ca_cert_path }}'
+
+filebeat_es_https: true
+filebeat_es_user: 'filebeat_push'
+filebeat_es_password: '{{ secret_filebeat_push }}'
+
+
+filebeat_modules:
+  - name: system
+    enabled: true
+  - name: iptables
+    enabled: true

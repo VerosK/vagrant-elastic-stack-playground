@@ -1,0 +1,13 @@
+metricbeat_backup_config: true
+
+metricbeat_elasticsearch_output_hosts:  '{{ elasticsearch_http_targets }}'
+
+metricbeat_es_cert_path: '{{ es_ca_cert_path }}'
+
+metricbeat_es_https: true
+metricbeat_es_user: 'metricbeat_push'
+metricbeat_es_password: '{{ secret_metricbeat_push }}'
+
+metricbeat_processors:
+  - add_host_metadata
+  - add_cloud_metadata

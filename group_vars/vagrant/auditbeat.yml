@@ -1,0 +1,10 @@
+auditbeat_backup_config: true
+
+auditbeat_elasticsearch_output_hosts: '{{ elasticsearch_http_targets }}'
+
+auditbeat_es_cert_path: '{{ es_ca_cert_path }}'
+
+auditbeat_es_https: true
+auditbeat_es_user: 'auditbeat_push'
+auditbeat_es_password: '{{ secret_auditbeat_push }}'
+
