@@ -18,7 +18,16 @@ cluters.
  
       vagrant provision node1
 
-# Nodes:
+## Kibana
+
+Connect to http://192.168.49.101:5601
+
+    Login:    testuser  
+    Password: nbusr123
+
+Change passwords in `group_vars/vagrant/secrets.yml` 
+
+# Notes:
 
 * SigmaUI does not work with Kibana 7.10 and newer
 
@@ -29,4 +38,7 @@ cluters.
 
 CC-0, WTFPL
 
+Do not use in production.
+
 No warranty provided. If it breaks, please keep both parts.
+
